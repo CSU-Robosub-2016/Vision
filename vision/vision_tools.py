@@ -72,7 +72,7 @@ class VisionTools:
     # @return coordList array of pixel coordinates 
     def LinePosition(self, detected):
         #Convert line to numpy array
-        npimg = np.asarray(frame)
+        npimg = np.asarray(detected)
 
         #Find any pixel where it is not black and store a coordinate for that pixel
         coordList = np.argwhere(npimg > [0, 0, 10])
