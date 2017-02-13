@@ -65,6 +65,24 @@ class VisionTools:
         output = cv2.bitwise_and(image2, image2, mask=mask)
 
         return output
+    
+    ##
+    # @brief Orange line position detection, developed by Brett Gonzales
+    # @param detected The detected line to find position
+    # @return coordList array of pixel coordinates 
+    def LinePosition(self, detected):
+        #Convert line to numpy array
+        npimg = np.asarray(frame)
+
+        #Find any pixel where it is not black and store a coordinate for that pixel
+        coordList = np.argwhere(npimg > [0, 0, 10])
+
+        #Find total number of red pixels
+        num = len(coordList)
+
+        #Returns array of pixel locations
+        return (coordList)
+        
 
     ##
     # @brief Draws the bounding boxes onto a frame
