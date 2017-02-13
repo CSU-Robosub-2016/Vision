@@ -70,6 +70,7 @@ class VisionTools:
     # @brief Orange line position detection, developed by Brett Gonzales
     # @param detected The detected line to find position
     # @return coordList array of pixel coordinates 
+    # @return num Total number of red pixels
     def LinePosition(self, detected):
         #Convert line to numpy array
         npimg = np.asarray(detected)
@@ -80,8 +81,8 @@ class VisionTools:
         #Find total number of red pixels
         num = len(coordList)
 
-        #Returns array of pixel locations
-        return (coordList)
+        #Returns array of pixel locations, and total number of red pixels
+        return coordList, num
         
 
     ##
