@@ -38,6 +38,35 @@ class VisionTools:
         output = cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
         
         return output
+    ##
+    # @brief Filters image by color
+    # @param frame The frame to be filtered
+    # @param lower The lower color limit in BGR
+    # @param upper The upper color limit in BGR
+    # @return output Returns image with only one color
+    def colorfilt(self, frame, lower, upper):
+        
+        #splits into color channels
+        b,g,r = cv2.split(frame)
+        M = np.maximum(np.maximum(r, g), b)
+        r[r < M] = 0
+        g[g < M] = 0
+        b[b < M] = 0
+        
+        #Merges max color channels back into the image
+        merge = cv2.merge([b, g, r])
+        
+        #Sets color filtering threshold
+        lower = np.array(lower)
+        upper = np.array(upper)
+        
+        #Masks image to find specific color
+        mask = cv2.inRange(merge, lower, upper)
+        
+        #Returns image with only R,G,B visible
+        output = cv2.bitwise_and(merge, merge, mask = mask)
+        
+        return output
         
     ##
     # @brief Orange line detection, developed by Brett Gonzales
