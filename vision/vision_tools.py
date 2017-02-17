@@ -59,7 +59,7 @@ class VisionTools:
         mask = cv2.inRange(merge, lower, upper)
         
         #Returns image with only R,G,B visible
-        output = cv2.bitwise_and(merge, merge, mask = mask)
+        output = cv2.bitwise_and(frame, frame, mask = mask)
         
         return output
     ##
