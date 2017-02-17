@@ -17,7 +17,7 @@ class VisionTools:
     ##
     # @brief Detects largest contour and draws a box around it
     # @param frame The frame in which a contour will be found
-    # @return output Returns a new image with a box around largest contour 
+    # @return output Returns a new image with just the largest contour
     def lineIdent(self, frame):
         frame = cv2.medianBlur(frame, 5)
 
@@ -35,7 +35,11 @@ class VisionTools:
 
         # Create Rectangle around largest contour (ROI)
         x, y, w, h = cv2.boundingRect(cnt)
-        output = cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+        roi = cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+        
+        mask = np.zeros(roi.shape,np.uint8)
+        mask[y:y+h,x:x+w] = roi[y:y+h,x:x+w]
+        output = cv2.bitwise_and(roi, mask)
         
         return output
     ##
