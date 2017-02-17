@@ -42,6 +42,26 @@ class VisionTools:
         output = cv2.bitwise_and(roi, mask)
         
         return output
+    
+    ##
+    # @brief Filters image by shade of gray
+    # @param frame The frame to be filtered
+    # @param lower The lower color limit in gray
+    # @param upper The upper color limit in gray
+    # @return output Returns image with only one shade of gray
+    def grayfilt(self, frame, lower, upper):
+        
+        #Sets color filtering threshold
+        lower = lower
+        upper = upper
+        
+        #Masks image to find specific color
+        mask = cv2.inRange(merge, lower, upper)
+        
+        #Returns image with only R,G,B visible
+        output = cv2.bitwise_and(merge, merge, mask = mask)
+        
+        return output
     ##
     # @brief Filters image by color
     # @param frame The frame to be filtered
