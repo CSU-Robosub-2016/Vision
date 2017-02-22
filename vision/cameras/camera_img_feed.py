@@ -2,7 +2,7 @@
 #                      and act as a camera.
 import cv2
 # import imutils
-from camera import Camera
+from .camera import Camera
 
 
 class imgFeedCamera(Camera):
