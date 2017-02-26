@@ -14,7 +14,84 @@ class VisionTools:
     def __init__(self):
         # Dummy variable, not used for anything
         self.useme = True
+    ##
+    # @brief Detects largest contour and draws a box around it
+    # @param frame The frame in which a contour will be found
+    # @return output Returns a new image with just the largest contour
+    def lineIdent(self, frame):
+        frame = cv2.medianBlur(frame, 5)
 
+        # Threshold filter to find contours
+        ret, thresh = cv2.threshold(frame, 153, 255, 0)
+        bw = cv2.cvtColor(thresh, cv2.COLOR_BGR2GRAY)
+        
+        # Find Contours
+        q, contours, hierarchy = cv2.findContours(bw, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+        # Find the index of the largest contour
+        areas = [cv2.contourArea(c) for c in contours]
+        max_index = np.argmax(areas)
+        cnt = contours[max_index]
+
+        # Create Rectangle around largest contour (ROI)
+        x, y, w, h = cv2.boundingRect(cnt)
+        roi = cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+        
+        mask = np.zeros(roi.shape,np.uint8)
+        mask[y:y+h,x:x+w] = roi[y:y+h,x:x+w]
+        output = cv2.bitwise_and(roi, mask)
+        
+        return output
+    
+    ##
+    # @brief Filters image by shade of gray
+    # @param frame The frame to be filtered
+    # @param lower The lower color limit in gray
+    # @param upper The upper color limit in gray
+    # @return output Returns image with only one shade of gray
+    def grayfilt(self, frame, lower, upper):
+        
+        #Sets color filtering threshold
+        lower = lower
+        upper = upper
+        
+        #Masks image to find specific color
+        mask = cv2.inRange(merge, lower, upper)
+        
+        #Returns image with only R,G,B visible
+        output = cv2.bitwise_and(frame, frame, mask = mask)
+        
+        return output
+    ##
+    # @brief Filters image by color
+    # @param frame The frame to be filtered
+    # @param lower The lower color limit in BGR
+    # @param upper The upper color limit in BGR
+    # @return output Returns image with only one color
+    def colorfilt(self, frame, lower, upper):
+        
+        #splits into color channels
+        b,g,r = cv2.split(frame)
+        M = np.maximum(np.maximum(r, g), b)
+        r[r < M] = 0
+        g[g < M] = 0
+        b[b < M] = 0
+        
+        #Merges max color channels back into the image
+        merge = cv2.merge([b, g, r])
+        
+        #Sets color filtering threshold
+        lower = np.array(lower)
+        upper = np.array(upper)
+        
+        #Masks image to find specific color
+        mask = cv2.inRange(merge, lower, upper)
+        
+        #Returns image with only R,G,B visible
+        output = cv2.bitwise_and(merge, merge, mask = mask)
+        
+        return output
+        
     ##
     # @brief Orange line detection, developed by Brett Gonzales
     # @param frame The frame to be filtered
@@ -69,9 +146,10 @@ class VisionTools:
     ##
     # @brief Orange line position detection, developed by Brett Gonzales
     # @param detected The detected line to find position
+    # @param color The color range for the position detection
     # @return coordList array of pixel coordinates 
     # @return num Total number of red pixels
-    def LinePosition(self, detected):
+    def LinePosition(self, detected, color):
         #Convert line to numpy array
         npimg = np.asarray(detected)
 
