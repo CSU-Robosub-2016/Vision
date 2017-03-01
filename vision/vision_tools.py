@@ -44,6 +44,29 @@ class VisionTools:
         return output
     
     ##
+    # @brief Finds midline of image
+    # @param image The final filtered line image
+    # @param coordList coordinates of line(2d Numpy array)
+    # @param minc The minimum color limit in gray/color
+    # @param newcolor The new color to draw the midline in gray/color
+    # @return output Returns image with a midline
+    def midline(self,image, coordList, minc, newcolor):
+        #Sort by y coords
+        coordList = coordList[np.argsort(coordList[:,1])]
+        
+        #Gives every unique y coordinate
+        yCoords = np.unique(coordList[:,1])
+        
+        for coord in yCoords:
+            coords = [elem[0] for elem in coordList if elem[1] == coord]
+            min = np.amin(coords)
+            max = np.amax(coords)
+            mid = ((max+min))/2
+            image[mid][coord] = newcolor
+        output=image
+        return image
+            
+    ##
     # @brief Filters image by shade of gray
     # @param frame The frame to be filtered
     # @param lower The lower color limit in gray
