@@ -64,7 +64,7 @@ class VisionTools:
             mid = ((max+min))/2
             image[mid][coord] = newcolor
         output=image
-        return image
+        return output
             
     ##
     # @brief Filters image by shade of gray
