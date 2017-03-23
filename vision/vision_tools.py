@@ -5,6 +5,7 @@ target tracking.
 '''
 import numpy as np
 import cv2
+import math
 
 
 class VisionTools:
@@ -313,13 +314,6 @@ class VisionTools:
         # Create image of average color (no use in final product)
         avg_color_img = np.array([[avg_color] * 640] * 360, np.uint8)
 
-        # Filter out background avg color
-        # Part a: filter out below avg-10
-        # upper = [0,0,0]
-        # for i in range (0, 3):
-        #     if avg_color[i] - 10 > 0:
-        #         upper[i] = avg_color[i] - 10
-
         upper_filter = np.array([avg_color[0] + 10, avg_color[1] + 10, avg_color[2] + 10])
         lower_filter = np.array([avg_color[0] - 10, avg_color[1] - 10, avg_color[2] - 10])
 
@@ -330,15 +324,31 @@ class VisionTools:
         frame = cv2.medianBlur(res, 5)
 
         # Threshold filter to find contours
-        ret, thresh = cv2.threshold(frame, 153, 255, 0)
         bw = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
         # Find Contours
         q, contours, hierarchy = cv2.findContours(bw, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-        # Create Rectangle around largest contour (ROI)
+        # Create Rectangle around largest contour (ROI) using average color of middle of contour
         for c in contours:
             x, y, w, h = cv2.boundingRect(c)
-            image = cv2.rectangle(image, (x, y), (x + w, y + h), (0, 0, 0), 2)
+            i = -5
+            redVal = 0
+            grnVal = 0
+            bluVal = 0
+            while i <=5:
+                j = -5
+                while j <=5:
+                    px = image[math.floor(y+0.5*h)+i, math.floor(x+0.5*w)+j]
+                    redVal += int(px[0])
+                    grnVal += int(px[1])
+                    bluVal += int(px[2])
+                    j += 1
+                i += 1
+            redVal /= 121
+            grnVal /= 121
+            bluVal /= 121
+
+            image = cv2.rectangle(image, (x, y), (x + w, y + h), (redVal, grnVal, bluVal), 2)
 
         return image
