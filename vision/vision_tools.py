@@ -314,8 +314,8 @@ class VisionTools:
         # Create image of average color (no use in final product)
         avg_color_img = np.array([[avg_color] * 640] * 360, np.uint8)
 
-        upper_filter = np.array([avg_color[0] + 10, avg_color[1] + 10, avg_color[2] + 10])
-        lower_filter = np.array([avg_color[0] - 10, avg_color[1] - 10, avg_color[2] - 10])
+        upper_filter = np.array([avg_color[0] + 50, avg_color[1] + 50, avg_color[2] + 50])
+        lower_filter = np.array([avg_color[0] - 50, avg_color[1] - 50, avg_color[2] - 50])
 
         mask = cv2.inRange(image, lower_filter, upper_filter)
         invert = cv2.bitwise_not(mask)
@@ -329,26 +329,39 @@ class VisionTools:
         # Find Contours
         q, contours, hierarchy = cv2.findContours(bw, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-        # Create Rectangle around largest contour (ROI) using average color of middle of contour
-        for c in contours:
-            x, y, w, h = cv2.boundingRect(c)
-            i = -5
+        # Find the index of the 3 largest contours
+        areas = [cv2.contourArea(c) for c in contours]
+        i = 0
+        cnt = [0, 0, 0]
+        max_index = [0, 0, 0]
+        while i < 3:
+            if i == 2:
+                areas[max_index[0]] = 0
+                areas[max_index[1]] = 0
+            elif i == 1:
+                areas[max_index[0]] = 0
+            max_index[i] = np.argmax(areas)
+            cnt[i] = contours[max_index[i]]
+
+        # Create Rectangle around 3 largest contours (ROI) using average color of middle of contour
+            x, y, w, h = cv2.boundingRect(cnt[i])
+            k = -5
             redVal = 0
             grnVal = 0
             bluVal = 0
-            while i <=5:
+            while k <=5:
                 j = -5
                 while j <=5:
-                    px = image[math.floor(y+0.5*h)+i, math.floor(x+0.5*w)+j]
+                    px = image[math.floor(y+0.5*h)+k, math.floor(x+0.5*w)+j]
                     redVal += int(px[0])
                     grnVal += int(px[1])
                     bluVal += int(px[2])
                     j += 1
-                i += 1
+                k += 1
             redVal /= 121
             grnVal /= 121
             bluVal /= 121
 
             image = cv2.rectangle(image, (x, y), (x + w, y + h), (redVal, grnVal, bluVal), 2)
-
+            i += 1
         return image
