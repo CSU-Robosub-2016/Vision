@@ -14,11 +14,12 @@ if __name__ == '__main__':
     print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 
     # Read original video, alter for different videos
-    im = cv2.VideoCapture("test_files/Buoy_Still.mov")
+    im = cv2.VideoCapture("test_files/Buoy_rightLeft.mov")
 
     # Define codex and create VideoWriter object
     fourcc = cv2.VideoWriter_fourcc(*'DIVX')
-    out = cv2.VideoWriter("test_files/BuoyStillOut.avi", fourcc, 60.0, (1920, 1080), False)
+    out = cv2.VideoWriter("test_files/BuoyRightLeftOut.avi", fourcc, 30.0, (1920, 1080), True)
+    print(out.isOpened())
 
     while(im.isOpened()):
         ret, frame = im.read()
@@ -33,4 +34,7 @@ if __name__ == '__main__':
         out.write(final)
 
         cv2.imshow('image', final)
-        cv2.waitKey(5)
+        cv2.waitKey(100)
+    im.release()
+    out.release()
+    cv2.destroyAllWindows()
