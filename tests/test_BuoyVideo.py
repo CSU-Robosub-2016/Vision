@@ -18,7 +18,7 @@ if __name__ == '__main__':
 
     # Define codex and create VideoWriter object
     fourcc = cv2.VideoWriter_fourcc(*'DIVX')
-    out = cv2.VideoWriter("test_files/BuoyVideoOut.avi", fourcc, 60.0, (1920, 1080), False)
+    out = cv2.VideoWriter("test_files/BuoyStillOut.avi", fourcc, 60.0, (1920, 1080), False)
 
     while(im.isOpened()):
         ret, frame = im.read()
@@ -29,6 +29,8 @@ if __name__ == '__main__':
         tools = VisionTools()
 
         final = tools.BuoyBoxes(im2)
+
+        out.write(final)
 
         cv2.imshow('image', final)
         cv2.waitKey(5)
