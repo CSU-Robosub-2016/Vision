@@ -14,27 +14,30 @@ if __name__ == '__main__':
     print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 
     # Read original video, alter for different videos
-    im = cv2.VideoCapture("test_files/Buoy_rightLeft.mov")
+    im = cv2.VideoCapture("test_files/Buoy_zoomOut.mov")
 
     # Define codex and create VideoWriter object
     fourcc = cv2.VideoWriter_fourcc(*'DIVX')
-    out = cv2.VideoWriter("test_files/BuoyRightLeftOut.avi", fourcc, 30.0, (1920, 1080), True)
-    print(out.isOpened())
+    out = cv2.VideoWriter("test_files/BuoyZoomOutOut.avi", fourcc, 30.0, (640, 360), True)
 
     while(im.isOpened()):
         ret, frame = im.read()
         if not ret:
             break
-        im2 = cv2.medianBlur(frame, 5)
+
+        # Resize Image
+        r = 640 / frame.shape[1]
+        dim = (640, int(frame.shape[0] * r))
+        image = cv2.resize(frame, dim, interpolation=cv2.INTER_AREA)
 
         tools = VisionTools()
 
-        final = tools.BuoyBoxes(im2)
+        final = tools.BuoyBoxes(image)
 
         out.write(final)
 
         cv2.imshow('image', final)
-        cv2.waitKey(100)
+        cv2.waitKey(1)
     im.release()
     out.release()
     cv2.destroyAllWindows()

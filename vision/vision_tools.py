@@ -361,7 +361,9 @@ class VisionTools:
             redVal /= 121
             grnVal /= 121
             bluVal /= 121
-
             image = cv2.rectangle(image, (x, y), (x + w, y + h), (redVal, grnVal, bluVal), 2)
+            buoyString = 'buoy ' + str(i)
+            image = cv2.putText(image, buoyString, (x, y+h),
+                                cv2.FONT_HERSHEY_TRIPLEX, 0.5, (0, 0, 0), 0, cv2.LINE_AA)
             i += 1
         return image
