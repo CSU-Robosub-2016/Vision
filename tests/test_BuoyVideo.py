@@ -6,6 +6,7 @@ test_simple.py - Tests registration of a single video against a background
                  '''
 import cv2
 from vision.vision_tools import VisionTools
+from vision.vision_tools import buoyTracker
 
 if __name__ == '__main__':
     print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
@@ -14,11 +15,13 @@ if __name__ == '__main__':
     print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 
     # Read original video, alter for different videos
-    im = cv2.VideoCapture("test_files/Buoy_zoomOut.mov")
+    im = cv2.VideoCapture("test_files/Buoy_rightLeft.mov")
 
     # Define codex and create VideoWriter object
     fourcc = cv2.VideoWriter_fourcc(*'DIVX')
-    out = cv2.VideoWriter("test_files/BuoyZoomOutOut.avi", fourcc, 30.0, (640, 360), True)
+    out = cv2.VideoWriter("test_files/BuoyRightLeftOut.avi", fourcc, 30.0, (640, 360), True)
+
+    boxes = buoyTracker()
 
     while(im.isOpened()):
         ret, frame = im.read()
@@ -32,7 +35,7 @@ if __name__ == '__main__':
 
         tools = VisionTools()
 
-        final = tools.BuoyBoxes(image)
+        final = tools.BuoyBoxes(image, boxes)
 
         out.write(final)
 

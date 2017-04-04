@@ -304,7 +304,7 @@ class VisionTools:
     # @brief Draws boxes around found buoys and returns image
     # @param image - The input image with buoys to be drawn over
     # @return image - The final image with boxes drawn over initial image
-    def BuoyBoxes(self, image):
+    def BuoyBoxes(self, image, boxes):
 
         # Get average background color
         avg_color_rows = np.average(image, axis=0)
@@ -362,8 +362,86 @@ class VisionTools:
             grnVal /= 121
             bluVal /= 121
             image = cv2.rectangle(image, (x, y), (x + w, y + h), (redVal, grnVal, bluVal), 2)
-            buoyString = 'buoy ' + str(i)
+            midx = x + 0.5*w
+            midy = y + 0.5*h
+            buoyString = 'buoy #' + str(boxes.check((midx, midy), (redVal, grnVal, bluVal)))
             image = cv2.putText(image, buoyString, (x, y+h),
                                 cv2.FONT_HERSHEY_TRIPLEX, 0.5, (0, 0, 0), 0, cv2.LINE_AA)
             i += 1
         return image
+
+class buoyTracker:
+    location = []
+    color = []
+    ##
+    # @brief Does nothing important for the time being.  Will add some
+    #        functionality later
+    def __init__(self):
+        # Dummy variable, not used for anything
+        self.useme = True
+
+    ##
+    # @brief base call function to track buoys
+    # @param location - midpoint of buoy to track
+    # @param color - RGB color of buoy to track
+    # @return match - returns the buoy number that has been tracked
+    def check(self, location, color):
+        closestLoc = self.checkLoc(location)
+        colorMatch = self.checkColor(color)
+        if len(self.location) < 3 or closestLoc == -1 or colorMatch == -1 or closestLoc != colorMatch:
+            self.addBuoy(location, color)
+            match = len(self.location) - 1
+        else:
+            match = closestLoc
+        self.update(location, color, match)
+        return match
+
+    ##
+    # @brief Finds buoy with closest location to last known buoys
+    # @param location - midpoint of buoy to track
+    # @return locMatch - index of buoy that has been tracked
+    def checkLoc(self, location):
+        locMatch = -1
+        closest = -1
+        for c in self.location:
+            x1, y1 = c
+            x2, y2 = location
+            distance = math.hypot(x1 - x2, y1 - y2)
+            if closest == -1:
+                closest = distance
+                locMatch = self.location.index(c)
+            elif closest > distance:
+                closest = distance
+                locMatch = self.location.index(c)
+        return locMatch
+
+    ##
+    # @brief Finds buoy with closest color to last known buoys
+    # @param color - RGB color of buoy to track
+    # @return colorMatch - index of buoy that has been tracked
+    def checkColor(self, color):
+        colorMatch = -1
+        closest = 250
+        for c in self.color:
+            difference = abs(color[0] - c[0]) + abs(color[1] - c[1]) + abs(color[2] - c[2])
+            if difference < closest:
+                closest = difference
+                colorMatch = self.color.index(c)
+        return colorMatch
+
+    ##
+    # @brief Adds a new buoy to class function to be searched
+    # @param location - midpoint of buoy to track
+    # @param color - RGB color of buoy to track
+    def addBuoy(self, location, color):
+        self.location.append(location)
+        self.color.append(color)
+
+    ##
+    # @brief updates buoy's new location and color
+    # @param location - midpoint of buoy to track
+    # @param color - RGB color of buoy to track
+    # @param index - index of buoy to be updated
+    def update(self, location, color, index):
+        self.location[index] = location
+        self.color[index] = color
